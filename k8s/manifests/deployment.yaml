@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tharun-go-web-app
+  labels:
+    app: tharun-go-web-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tharun-go-web-app
+  template:
+    metadata:
+      labels:
+        app: tharun-go-web-app
+    spec:
+      containers:
+        - name: tharun-go-web-app
+          image: tharunm11/tharun-go-web-app
+          ports:
+            - containerPort: 8080

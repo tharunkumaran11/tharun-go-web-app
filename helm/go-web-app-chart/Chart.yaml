@@ -1,0 +1,8 @@
+apiVersion: v2
+name: tharun-go-web-app
+description: Helm chart for Tharun Kumaran Go web application
+type: application
+version: 0.1.0
+appVersion: "1.0"
+
+
