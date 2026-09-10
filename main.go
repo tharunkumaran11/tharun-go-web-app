@@ -13,7 +13,7 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Fprint(w, `<!DOCTYPE html><html><head><title>Tharun Kumaran.M | DevOps & Cloud</title><link rel="stylesheet" href="/static/style.css"></head><body>
 <header><h1>Tharun Kumaran</h1><nav><a href="/">Home</a><a href="/about">About</a><a href="/projects">Projects</a><a href="/contact">Contact</a></nav></header>
-<main class="hero"><p class="eyebrow">DEVOPS & CLOUD ENTHUSIAST</p><h2>Hi, I'm Tharun Kumaran.</h2><p>I am a DevOps and Cloud enthusiast passionate about automation, cloud infrastructure, containers, Kubernetes and CI/CD.</p><a class="button" href="/about">About Me</a></main>
+<main class="hero"><p class="eyebrow">DEVOPS & CLOUD ENTHUSIAST</p><h2>Hi, I'm Tharun Kumaran.M.</h2><p>I am a DevOps and Cloud enthusiast passionate about automation, cloud infrastructure, containers, Kubernetes and CI/CD.</p><a class="button" href="/about">About Me</a></main>
 <footer>Built with Go</footer></body></html>`)
 }
 
