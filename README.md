@@ -1,543 +1,136 @@
 # Tharun Kumaran - Go Web Application
 
-A Go-based web application deployed using a complete **DevOps and GitOps workflow** with Docker, Kubernetes, Helm, GitHub Actions, Argo CD, and AWS EKS.
-
-The project demonstrates how a simple Go web application can be containerized, tested, packaged, deployed, and continuously delivered to Kubernetes using modern DevOps practices.
-
----
-
-## 🚀 Project Overview
-
-This project implements an end-to-end CI/CD and GitOps pipeline:
-
-```text
-Developer
-    │
-    │ git push
-    ▼
- GitHub
-    │
-    ▼
-GitHub Actions
-    │
-    ├── Run Go Tests
-    ├── Build Docker Image
-    ├── Push Image to Docker Hub
-    └── Update Helm Image Tag
-    │
-    ▼
- Git Repository
-    │
-    ▼
-  Argo CD
-    │
-    ▼
-   Helm
-    │
-    ▼
- AWS EKS
-    │
-    ├── Deployment
-    │      └── Go Application Pod
-    │
-    ├── Service
-    │
-    └── Ingress
-            │
-            ▼
-     AWS Application
-     Load Balancer
-            │
-            ▼
-        Internet
-```
-
----
-
-## 🛠️ Technologies Used
-
-| Technology                        | Purpose                          |
-| --------------------------------- | -------------------------------- |
-| **Go**                            | Application development          |
-| **Go Testing**                    | Application testing              |
-| **Docker**                        | Containerization                 |
-| **Docker Hub**                    | Container image registry         |
-| **Kubernetes**                    | Container orchestration          |
-| **Helm**                          | Kubernetes application packaging |
-| **GitHub Actions**                | CI automation                    |
-| **Argo CD**                       | GitOps-based continuous delivery |
-| **AWS EKS**                       | Managed Kubernetes cluster       |
-| **AWS Load Balancer Controller**  | Creates and manages AWS ALB      |
-| **AWS Application Load Balancer** | External application access      |
-
----
-
-## 📁 Project Structure
-
-```text
-tharun-go-web-app/
-│
-├── .github/
-│   └── workflows/
-│       └── cicd.yaml
-│
-├── helm/
-│   └── go-web-app-chart/
-│       ├── Chart.yaml
-│       ├── values.yaml
-│       └── templates/
-│           ├── deployment.yaml
-│           ├── service.yaml
-│           └── ingress.yaml
-│
-├── k8s/
-│   └── manifests/
-│       ├── deployment.yaml
-│       ├── service.yaml
-│       └── ingress.yaml
-│
-├── static/
-│   └── CSS and static assets
-│
-├── Dockerfile
-├── go.mod
-├── main.go
-├── main_test.go
-├── README.md
-└── README-DevOps.md
-```
+This is a Go-based web application that I used to build and implement an end-to-end DevOps and GitOps workflow.
 
----
+The project covers application development, testing, Docker containerization, Kubernetes deployment, Helm, GitHub Actions, Argo CD, and AWS EKS.
 
-## 🌐 Application
+## Project Overview
 
-The application is written in Go and runs on port **8080**.
+The main idea of this project was to take a Go web application and implement the complete deployment process using DevOps tools and practices.
 
-### Application Routes
+The application is first tested using Go testing. GitHub Actions is then used to build the Docker image and push it to Docker Hub. The Helm configuration is updated with the new Docker image tag.
 
-| Route       | Description           |
-| ----------- | --------------------- |
-| `/`         | Home page             |
-| `/about`    | About page            |
-| `/projects` | Projects page         |
-| `/contact`  | Contact page          |
-| `/health`   | Health check endpoint |
+Argo CD monitors the GitHub repository and deploys the updated application to Kubernetes running on AWS EKS.
 
-The `/health` endpoint can be used to verify that the application is running correctly.
+For external access, I used the AWS Load Balancer Controller to create and manage an AWS Application Load Balancer.
 
----
+The overall workflow is:
 
-# 🐳 Docker
+Developer → GitHub → GitHub Actions → Docker Hub → Helm → Argo CD → AWS EKS → AWS ALB → Application
 
-The application is containerized using a multi-stage Docker build.
+## Technologies Used
 
-### Dockerfile
+- Go
+- Docker
+- Docker Hub
+- Kubernetes
+- Helm
+- GitHub Actions
+- Argo CD
+- AWS EKS
+- AWS Load Balancer Controller
+- AWS Application Load Balancer
 
-The first stage uses Go 1.22 Alpine to build the application, while the final image uses Alpine Linux to keep the runtime image smaller.
+## Application
 
-```dockerfile
-FROM golang:1.22-alpine AS builder
+The application is written in Go and runs on port 8080.
 
-WORKDIR /app
+It contains the following pages:
 
-COPY go.mod ./
-COPY main.go main_test.go ./
+- Home
+- About
+- Projects
+- Contact
 
-RUN go build -o web-app main.go
+It also has a `/health` endpoint for checking the application status.
 
-FROM alpine:3.20
+## Docker
 
-WORKDIR /app
+I containerized the Go application using a multi-stage Dockerfile.
 
-COPY --from=builder /app/web-app .
-COPY static ./static
+The Docker image is built and pushed to Docker Hub. The image is tagged using the Git commit SHA so that every application version has a unique image tag.
 
-EXPOSE 8080
+## Kubernetes
 
-CMD ["./web-app"]
-```
+The application is deployed to Kubernetes using a Deployment, Service and Ingress.
 
-### Build the Image
+The Deployment manages the application Pods.
 
-```bash
-docker build -t tharunm11/tharun-go-web-app:v1 .
-```
+The Service is configured as a ClusterIP service and connects the Kubernetes network to the application running on port 8080.
 
-### Run Locally
+The Ingress is used to expose the application through the AWS Application Load Balancer.
 
-```bash
-docker run -p 8080:8080 tharunm11/tharun-go-web-app:v1
-```
+The traffic flow is:
 
-Application:
+Internet → AWS ALB → Ingress → Service → Application Pod
 
-```text
-http://localhost:8080
-```
+## Helm
 
----
+I used Helm to package and manage the Kubernetes deployment.
 
-# ☸️ Kubernetes
+The Helm chart contains the Kubernetes configuration and allows values such as the Docker image, image tag and replica count to be configured easily.
 
-The project contains Kubernetes manifests for:
+The Docker image tag is updated automatically by the CI pipeline.
 
-* Deployment
-* Service
-* Ingress
+## CI/CD
 
-## Deployment
+GitHub Actions is used for the CI part of the project.
 
-The Deployment manages the Go application Pod. The application container listens on port `8080`.
+Whenever changes are pushed to the main branch, the workflow:
 
-```yaml
-kind: Deployment
-```
+1. Runs the Go tests
+2. Builds the Docker image
+3. Pushes the image to Docker Hub
+4. Updates the image tag in the Helm values
+5. Pushes the updated Helm configuration back to GitHub
 
-The current configuration uses:
+## GitOps with Argo CD
 
-```yaml
-replicas: 1
-```
+Argo CD is used for the Continuous Delivery part.
 
-## Service
+Instead of GitHub Actions directly deploying to Kubernetes, the deployment configuration is stored in Git.
 
-A Kubernetes `ClusterIP` Service exposes the application internally.
+Argo CD monitors the repository and synchronizes the changes to the Kubernetes cluster.
 
-```text
-Service Port: 80
-Target Port: 8080
-```
+This follows the GitOps approach where Git is used as the source of truth for the deployment configuration.
 
-This allows Kubernetes traffic to reach the Go application running inside the Pod.
+## AWS Deployment
 
-## Ingress
+The application is deployed on an AWS EKS cluster.
 
-The application uses Kubernetes Ingress with the AWS Load Balancer Controller.
+The AWS Load Balancer Controller is used with Kubernetes Ingress to provision an internet-facing AWS Application Load Balancer.
 
-The Ingress is configured as an **internet-facing AWS Application Load Balancer** using IP targets.
+The final application flow is:
 
-Traffic flow:
+Internet → AWS ALB → Kubernetes Ingress → Service → Go Application
 
-```text
-Internet
-   ↓
-AWS Application Load Balancer
-   ↓
-Kubernetes Ingress
-   ↓
-ClusterIP Service
-   ↓
-Go Application Pod
-```
+## Testing
 
----
+The project contains Go tests which can be run using:
 
-# 📦 Helm
+`go test ./...`
 
-The Kubernetes deployment is also packaged using Helm.
+The same tests are also executed automatically through GitHub Actions before the Docker image is built.
 
-```text
-helm/
-└── go-web-app-chart/
-    ├── Chart.yaml
-    ├── values.yaml
-    └── templates/
-        ├── deployment.yaml
-        ├── service.yaml
-        └── ingress.yaml
-```
+## Project Objective
 
-The Helm chart contains configurable values such as:
+The objective of this project was to understand and implement a complete DevOps workflow for a Go application.
 
-```yaml
-replicaCount: 1
+It covers:
 
-image:
-  repository: tharunm11/tharun-go-web-app
-  pullPolicy: IfNotPresent
-  tag: "<git-commit-sha>"
-```
+- Application development
+- Testing
+- Docker containerization
+- Docker image management
+- Kubernetes deployment
+- Helm
+- CI using GitHub Actions
+- GitOps using Argo CD
+- Deployment on AWS EKS
+- AWS Application Load Balancer
 
-The image tag is updated automatically by the CI pipeline.
+## Author
 
-### Helm Installation
+Tharun Kumaran
 
-```bash
-helm install tharun-go-web-app ./helm/go-web-app-chart
-```
-
-### Upgrade
-
-```bash
-helm upgrade tharun-go-web-app ./helm/go-web-app-chart
-```
-
----
-
-# 🔄 CI/CD Pipeline
-
-GitHub Actions is used for Continuous Integration.
-
-The pipeline runs when changes are pushed to or pull requests are created against the `main` branch.
-
-### CI Flow
-
-```text
-Git Push
-   ↓
-GitHub Actions
-   ↓
-Run Go Tests
-   ↓
-Build Docker Image
-   ↓
-Push Image to Docker Hub
-   ↓
-Update Helm Image Tag
-   ↓
-Git Repository
-```
-
-### Docker Image Tagging
-
-Docker images are tagged using the Git commit SHA.
-
-Example:
-
-```text
-tharunm11/tharun-go-web-app:<commit-sha>
-```
-
-Using the commit SHA provides an immutable reference to the exact application version.
-
----
-
-# 🔁 GitOps with Argo CD
-
-Argo CD is used for Continuous Delivery.
-
-Instead of GitHub Actions directly deploying to Kubernetes, the desired Kubernetes state is stored in Git.
-
-```text
-GitHub
-   │
-   │ Desired State
-   ▼
-Argo CD
-   │
-   │ Sync
-   ▼
-Helm
-   │
-   ▼
-AWS EKS
-```
-
-Argo CD continuously monitors the Git repository and synchronizes the Kubernetes environment with the desired state defined in Git.
-
-### Benefits
-
-* Git acts as the source of truth
-* Declarative deployments
-* Automatic synchronization
-* Easier rollback
-* Improved deployment visibility
-* Separation of CI and CD responsibilities
-
----
-
-# ☁️ AWS Deployment
-
-The application runs on **Amazon EKS**.
-
-The deployment architecture consists of:
-
-```text
-AWS EKS
-│
-├── Worker Node
-│    └── Go Application Pod
-│
-├── Worker Node
-│
-├── Kubernetes Service
-│
-└── Ingress
-      │
-      ▼
-AWS Load Balancer Controller
-      │
-      ▼
-AWS Application Load Balancer
-```
-
-The AWS Load Balancer Controller watches the Kubernetes Ingress resource and manages the corresponding AWS Application Load Balancer.
-
----
-
-# 🔐 Security
-
-Sensitive credentials are not stored directly inside the GitHub Actions workflow.
-
-Docker Hub authentication is handled using GitHub repository secrets.
-
-Example secrets:
-
-```text
-DOCKERHUB_USERNAME
-DOCKERHUB_TOKEN
-```
-
-The workflow accesses them through GitHub Actions secrets.
-
----
-
-# 🧪 Testing
-
-The Go application contains automated tests in:
-
-```text
-main_test.go
-```
-
-Tests can be executed locally using:
-
-```bash
-go test ./...
-```
-
-The same tests are executed as part of the GitHub Actions pipeline before the Docker image is built.
-
----
-
-# 🚀 Deployment Workflow
-
-A typical application update follows this process:
-
-### 1. Make a code change
-
-```bash
-git add .
-git commit -m "Update application"
-```
-
-### 2. Push to GitHub
-
-```bash
-git push origin main
-```
-
-### 3. GitHub Actions runs
-
-The pipeline:
-
-```text
-Run Tests
-    ↓
-Build Docker Image
-    ↓
-Push Docker Image
-    ↓
-Update Helm Image Tag
-```
-
-### 4. Argo CD detects the Git change
-
-Argo CD detects the updated Helm configuration.
-
-### 5. Argo CD synchronizes Kubernetes
-
-```text
-Git
- ↓
-Argo CD
- ↓
-Helm
- ↓
-Kubernetes
-```
-
-### 6. Kubernetes starts the new version
-
-The Deployment updates the application Pod with the new Docker image.
-
-### 7. Application is available
-
-```text
-Internet
-   ↓
-AWS ALB
-   ↓
-Ingress
-   ↓
-Service
-   ↓
-Go Application
-```
-
----
-
-# 📊 DevOps Features
-
-This project demonstrates:
-
-* ✅ Go application development
-* ✅ Automated Go testing
-* ✅ Docker containerization
-* ✅ Multi-stage Docker builds
-* ✅ Docker Hub image publishing
-* ✅ Kubernetes Deployment
-* ✅ Kubernetes Service
-* ✅ Kubernetes Ingress
-* ✅ Helm packaging
-* ✅ GitHub Actions CI
-* ✅ Git SHA-based Docker image tagging
-* ✅ GitOps workflow
-* ✅ Argo CD continuous delivery
-* ✅ AWS EKS deployment
-* ✅ AWS Application Load Balancer
-* ✅ AWS Load Balancer Controller
-* ✅ Kubernetes-based application deployment
-
----
-
-# 🎯 Project Objective
-
-The main objective of this project is to demonstrate an end-to-end DevOps workflow for a Go web application.
-
-The project takes the application from:
-
-```text
-Source Code
-    ↓
-Testing
-    ↓
-Docker Image
-    ↓
-Container Registry
-    ↓
-Kubernetes
-    ↓
-Helm
-    ↓
-GitOps
-    ↓
-AWS EKS
-    ↓
-AWS ALB
-    ↓
-Live Application
-```
-
-This demonstrates how development, containerization, CI/CD, Kubernetes, cloud infrastructure, and GitOps can be integrated into a single deployment workflow.
-
----
-
-## 👨‍💻 Author
-
-**Tharun Kumaran**
-
-DevOps & Cloud Enthusiast
-
-GitHub:
-https://github.com/tharunkumaran11
+GitHub: https://github.com/tharunkumaran11/tharun-go-web-app
