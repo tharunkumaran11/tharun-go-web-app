@@ -8,7 +8,7 @@ image:
   repository: tharunm11/tharun-go-web-app
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "1aaaa5e6228f46e090a9e7fedee72021cee3e058"
+  tag: "7a01c36ab7160ca94c7f27cfae5518c95a463d5e"
 
 ingress:
   enabled: false
