@@ -21,7 +21,7 @@ func aboutPage(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/about" { http.NotFound(w, r); return }
 	fmt.Fprint(w, `<!DOCTYPE html><html><head><title>About | Tharun Kumaran</title><link rel="stylesheet" href="/static/style.css"></head><body>
 <header><h1>Tharun Kumaran</h1><nav><a href="/">Home</a><a href="/about">About</a><a href="/projects">Projects</a><a href="/contact">Contact</a></nav></header>
-<main class="content"><h2>About Me</h2><p>I am focused on building hands-on DevOps and Cloud projects and continuously improving my practical skills.</p><p>I work with technologies such as Docker, Kubernetes, AWS, Helm, GitHub Actions and Argo CD, and I enjoy turning application code into reliable, automated deployments.</p><p>I am currently building projects, expanding my cloud and DevOps knowledge, and looking for opportunities with companies where I can contribute, learn from experienced engineers and grow as a DevOps professional.</p></main>
+<main class="content"><h2>About Me</h2><p>I'm focused on building hands-on DevOps and Cloud projects and continuously improving my practical skills.</p><p>I work with technologies such as Docker, Kubernetes, AWS, Helm, GitHub Actions and Argo CD, and I enjoy turning application code into reliable, automated deployments.</p><p>I am currently building projects, expanding my cloud and DevOps knowledge, and looking for opportunities with companies where I can contribute, learn from experienced engineers and grow as a DevOps professional.</p></main>
 <footer>Built with Go</footer></body></html>`)
 }
 
