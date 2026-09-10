@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: tharunm11/go-web-app
+  repository: tharunm11/tharun-go-web-app
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: "v1"
